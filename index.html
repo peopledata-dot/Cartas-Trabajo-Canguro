@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generador de Cartas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #000;
+      color: #fff;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    form {
+      max-width: 500px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+    }
+    button {
+      cursor: pointer;
+      margin-top: 12px;
+      background-color: #FFD700;
+      color: #000;
+      font-weight: bold;
+      border: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 40px;
+    }
+    th, td {
+      border: 1px solid #FFD700;
+      padding: 8px;
+      text-align: left;
+    }
+    thead {
+      background-color: #222;
+      color: #FFD700;
+    }
+    #generar-masivo {
+      margin-bottom: 20px;
+    }
+    #cerrar-sesion {
+      position: fixed;
+      top: 20px;
+      left: 900px;
+      background: none;
+      color: #FFD700;
+      font-weight: bold;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    if (localStorage.getItem('sesionCanguro') !== 'activa') {
+      window.location.href = 'login.html';
+    }
+  </script>
+
+  <button id="cerrar-sesion" onclick="cerrarSesion()">Cerrar sesión</button>
+
+  <div style="text-align: center; margin-bottom: 20px;">
+    <img src="logo-canguro.png" alt="Logo Canguro" style="height: 100px; margin-bottom: 10px;" />
+    <h2>Generador de Cartas de Trabajo Canguro Venezuela</h2>
+  </div>
+
+  <form id="form-carta-html">
+    <label>Cédula: <input type="text" name="cedula" required /></label>
+    <label>Nombre: <input type="text" name="nombre" required /></label>
+    <label>Cargo: <input type="text" name="cargo" required /></label>
+    <label>Razón Social: <input type="text" name="razon" required /></label>
+    <label>Ingreso: <input type="date" name="ingreso" required /></label>
+    <label>Egreso: <input type="date" name="egreso" /></label>
+    <label>Sueldo: <input type="text" name="sueldo" required /></label>
+    <button type="submit">📄 Ver Carta</button>
+  </form>
+
+  <h2 style="color: #FFD700;">Empleados Activos Organizacional</h2>
+  <button id="generar-masivo">Generar cartas masivas</button>
+  <table id="tabla-empleados">
+    <thead>
+      <tr>
+        <th>Cédula</th>
+        <th>Nombre</th>
+        <th>Cargo</th>
+        <th>Ingreso</th>
+        <th>Egreso</th>
+        <th>Sueldo</th>
+        <th>Razón</th>
+      </tr>
+    </thead>
+    <tbody id="cuerpo-tabla"></tbody>
+  </table>
+
+  <script>
+    const SHEET_ID = '19i5pwrIx8RX0P2OkE1qY2o5igKvvv2hxUuvb9jM_8LE'; // ← reemplaza con tu ID real
+    const API_KEY = 'AIzaSyD8Su9VTM_oynBtrPvVA4zRyeu-UjeEJDw';         // ← reemplaza con tu API Key real
+    const RANGE = 'Empleados!A2:G';
+    let empleados = [];
+
+    async function cargarEmpleados() {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        empleados = (data.values || []).map(row => ({
+          cedula: row[0] || '',
+          nombre: row[1] || '',
+          cargo: row[2] || '',
+          ingreso: row[3] || '',
+          egreso: row[4] || '',
+          sueldo: row[5] || '',
+          razon: row[6] || ''
+        }));
+
+        const cuerpo = document.getElementById('cuerpo-tabla');
+        cuerpo.innerHTML = '';
+        empleados.forEach(emp => {
+          const fila = document.createElement('tr');
+          fila.innerHTML = `
+            <td>${emp.cedula}</td>
+            <td>${emp.nombre}</td>
+            <td>${emp.cargo}</td>
+            <td>${emp.ingreso}</td>
+            <td>${emp.egreso}</td>
+            <td>${emp.sueldo}</td>
+            <td>${emp.razon}</td>
+          `;
+          cuerpo.appendChild(fila);
+        });
+      } catch (err) {
+        alert('Error al cargar empleados');
+        console.error(err);
+      }
+    }
+
+    function abrirCarta({ cedula, nombre, cargo, ingreso, egreso, sueldo, razon }) {
+      const fecha = new Date().toLocaleDateString('es-VE');
+      const html = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <title>Constancia de Trabajo</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+            h1 { text-align: center; }
+            .firma { margin-top: 80px; text-align: left; }
+          </style>
+        </head>
+        <body>
+          <h1>CONSTANCIA DE TRABAJO</h1>
+          <p>Por medio de la presente se hace constar que el ciudadano <strong>${nombre}</strong>, titular de la cédula de identidad N° <strong>${cedula}</strong>, desempeñó el cargo de <strong>${cargo}</strong> en <strong>${razon}</strong> desde el <strong>${ingreso}</strong> hasta el <strong>${egreso || 'la actualidad'}</strong>, percibiendo un sueldo mensual de <strong>${sueldo}</strong>.</p>
+          <p>Esta constancia se expide a solicitud del interesado, en Los Teques, a los ${fecha}.</p>
+          <div class="firma">
+            <p>__________________________</p>
+            <p>Departamento de Recursos Humanos</p>
+            <p>${razon}</p>
+          </div>
+        </body>
+        </html>
+      `;
+      const win = window.open('', '_blank');
+      win.document.write(html);
+      win.document.close();
+    }
+
+    document.getElementById('form-carta-html').addEventListener('submit', e => {
+      e.preventDefault();
+      const datos = Object.fromEntries(new FormData(e.target));
+      abrirCarta(datos);
+    });
+
+    document.getElementById('generar-masivo').addEventListener('click', () => {
+      empleados.forEach(emp => abrirCarta(emp));
+    });
+
+    document.querySelector('input[name="cedula"]').addEventListener('input', e => {
+      const cedula = e.target.value.trim();
+      const emp = empleados.find(e => e.cedula === cedula);
+      if (emp) {
+        document.querySelector('input[name="nombre"]').value = emp.nombre;
+        document.querySelector('input[name="cargo"]').value = emp.cargo;
+        document.querySelector('input[name="ingreso"]').value = emp.ingreso;
+        document.querySelector('input[name="egreso"]').value = emp.egreso;
+        document.querySelector('input[name="sueldo"]').value = emp.sueldo;
+        document.querySelector('input[name="razon"]').value = emp.razon;
+      }
+    });
+
+    function cerrarSesion() {
+      localStorage.removeItem('sesionCanguro');
+      window.location.href = 'login.html';
+    }
+
+    cargarEmpleados();
+  </script>
+</body>
+</html>
