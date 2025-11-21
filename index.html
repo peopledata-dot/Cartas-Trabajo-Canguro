@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Generador de Cartas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -10,22 +11,21 @@
       background-color: #000;
       color: #fff;
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    form {
-      max-width: 500px;
-      margin: auto;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
+    h1, h2 { text-align: center; }
+    h1 { color: #FFD700; margin: 0 0 6px; }
+    h2 { margin-bottom: 20px; }
+
+    label { display: block; margin-top: 10px; }
     input, button {
       width: 100%;
       padding: 8px;
-      margin-top: 4px;
+      margin-top: 6px;
+      box-sizing: border-box;
+    }
+    input {
+      background: #222;
+      color: #FFD700;
+      border: 1px solid #FFD700;
     }
     button {
       cursor: pointer;
@@ -35,23 +35,6 @@
       font-weight: bold;
       border: none;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 40px;
-    }
-    th, td {
-      border: 1px solid #FFD700;
-      padding: 8px;
-      text-align: left;
-    }
-    thead {
-      background-color: #222;
-      color: #FFD700;
-    }
-    #generar-masivo {
-      margin-bottom: 20px;
-    }
     #cerrar-sesion {
       position: fixed;
       top: 20px;
@@ -60,154 +43,310 @@
       color: #FFD700;
       font-weight: bold;
       border: none;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
+      text-decoration: underline;
     }
+    .logo-wrap {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .logo-wrap img {
+      height: 100px;
+      margin-bottom: 8px;
+    }
+    #generar-masivo {
+      max-width: 320px;
+      margin: 0 auto 16px auto;
+      display: block;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #FFD700;
+      padding: 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+    thead {
+      background-color: #222;
+      color: #FFD700;
+    }
+    tr:nth-child(even) { background-color: #141414; }
+    tr:hover { background-color: #1a1a1a; }
+    .pie {
+      text-align: center;
+      font-size: 14px;
+      color: #FFD700;
+      margin-top: 30px;
+    }
+    @media (max-width: 640px) {
+      body { margin: 20px; }
+      th, td { font-size: 12px; }
+      .logo-wrap img { height: 80px; }
+    }
+    .oculto {
+  display: none;
+}
+
+
+
   </style>
 </head>
 <body>
   <script>
+    // Protección de ruta: requiere sesión activa
     if (localStorage.getItem('sesionCanguro') !== 'activa') {
-      window.location.href = 'login.html';
+      window.location.href = 'iniciar-sesion.html'; // ajusta si tu login se llama diferente
     }
   </script>
 
   <button id="cerrar-sesion" onclick="cerrarSesion()">Cerrar sesión</button>
 
-  <div style="text-align: center; margin-bottom: 20px;">
-    <img src="logo-canguro.png" alt="Logo Canguro" style="height: 100px; margin-bottom: 10px;" />
-    <h2>Generador de Cartas de Trabajo Canguro Venezuela</h2>
-  </div>
+  <div class="logo-wrap">
+    <img src="logo-canguro.png" alt="Logo Canguro" />
+    <h1>Generador de Cartas de Trabajo Canguro Venezuela</h1>
+    </div>
 
-  <form id="form-carta-html">
-    <label>Cédula: <input type="text" name="cedula" required /></label>
-    <label>Nombre: <input type="text" name="nombre" required /></label>
-    <label>Cargo: <input type="text" name="cargo" required /></label>
-    <label>Razón Social: <input type="text" name="razon" required /></label>
-    <label>Ingreso: <input type="date" name="ingreso" required /></label>
-    <label>Egreso: <input type="date" name="egreso" /></label>
-    <label>Sueldo: <input type="text" name="sueldo" required /></label>
-    <button type="submit">📄 Ver Carta</button>
-  </form>
+  <!-- Formulario para Carta rápida -->
+
+    <form id="form-carta-html">
+  <label class="oculto">Cédula:
+    <input type="text" name="cedula" required />
+  </label>
+  <label class="oculto">Nombre:
+    <input type="text" name="nombre" required />
+  </label>
+  <label class="oculto">Cargo:
+    <input type="text" name="cargo" required />
+  </label>
+  <label class="oculto">Razón Social:
+    <input type="text" name="razon" />
+  </label>
+  <label class="oculto">Ingreso:
+    <input type="date" name="ingreso" required />
+  </label>
+  <label class="oculto">Egreso:
+    <input type="date" name="egreso" />
+  </label>
+  <label class="oculto">Sueldo:
+    <input type="text" name="sueldo" required />
+  </label>
+
+  <!-- ✅ Botón oculto también -->
+  <button type="submit" class="oculto">📄 Ver Carta</button>
+</form>
+
 
   <h2 style="color: #FFD700;">Empleados Activos Organizacional</h2>
   <button id="generar-masivo">Generar cartas masivas</button>
+
   <table id="tabla-empleados">
-    <thead>
-      <tr>
-        <th>Cédula</th>
-        <th>Nombre</th>
-        <th>Cargo</th>
-        <th>Ingreso</th>
-        <th>Egreso</th>
-        <th>Sueldo</th>
-        <th>Razón</th>
-      </tr>
-    </thead>
-    <tbody id="cuerpo-tabla"></tbody>
-  </table>
+  <thead>
+    <tr>
+      <th><input type="checkbox" id="selectAll" /></th>
+      <th>Cédula</th>
+      <th>Nombre</th>
+      <th>Cargo</th>
+      <th>Ingreso</th>
+      <th>Egreso</th>
+      <th>Sueldo</th>
+      <th>Razón</th>
+      <th>Generar</th> <!-- ✅ nueva columna -->
+    </tr>
+  </thead>
+  <tbody id="cuerpo-tabla"></tbody>
+</table>
+
+  <p class="pie">Dirección de Tecnología 2025 - Canguro Venezuela</p>
 
   <script>
-    const SHEET_ID = '19i5pwrIx8RX0P2OkE1qY2o5igKvvv2hxUuvb9jM_8LE'; // ← reemplaza con tu ID real
-    const API_KEY = 'AIzaSyD8Su9VTM_oynBtrPvVA4zRyeu-UjeEJDw';         // ← reemplaza con tu API Key real
-    const RANGE = 'Empleados!A2:G';
+    // Config Sheets
+    const SHEET_ID = '19i5pwrIx8RX0P2OkE1qY2o5igKvvv2hxUuvb9jM_8LE'; // reemplaza por tu ID
+    const API_KEY  = 'AIzaSyD8Su9VTM_oynBtrPvVA4zRyeu-UjeEJDw';       // reemplaza por tu API Key
+    const RANGE    = 'Empleados!A2:N';
+
     let empleados = [];
 
+    // Carga empleados desde Google Sheets
     async function cargarEmpleados() {
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
       try {
         const res = await fetch(url);
         const data = await res.json();
-        empleados = (data.values || []).map(row => ({
-          cedula: row[0] || '',
-          nombre: row[1] || '',
-          cargo: row[2] || '',
-          ingreso: row[3] || '',
-          egreso: row[4] || '',
-          sueldo: row[5] || '',
-          razon: row[6] || ''
-        }));
+
+        empleados = (data.values || []).map(row => {
+  const ingreso = row[3] || '';
+  const egreso  = row[4] || '';
+  const estatus = egreso.trim() ? 'Egreso' : 'Activo';
+  return {
+    cedula: row[0] || '',
+    nombre: row[1] || '',
+    cargo:  row[2] || '',
+    ingreso,
+    egreso,
+    sueldo: row[5] || '',
+    razon:  row[6] || '',
+    rif:    row[12] || '',
+    direccion: row[13] || '',
+    estatus: row[4] && row[4].trim() ? 'Egreso' : 'Activo'
+  };
+});
 
         const cuerpo = document.getElementById('cuerpo-tabla');
         cuerpo.innerHTML = '';
-        empleados.forEach(emp => {
-          const fila = document.createElement('tr');
-          fila.innerHTML = `
-            <td>${emp.cedula}</td>
-            <td>${emp.nombre}</td>
-            <td>${emp.cargo}</td>
-            <td>${emp.ingreso}</td>
-            <td>${emp.egreso}</td>
-            <td>${emp.sueldo}</td>
-            <td>${emp.razon}</td>
-          `;
-          cuerpo.appendChild(fila);
-        });
+
+        empleados.forEach((emp, i) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="checkbox" class="check-empleado" data-index="${i}" /></td>
+    <td>${emp.cedula}</td>
+    <td>${emp.nombre}</td>
+    <td>${emp.cargo}</td>
+    <td>${emp.ingreso}</td>
+    <td>${emp.egreso}</td>
+    <td>${emp.sueldo}</td>
+    <td>${emp.razon}</td>
+    <td><button class="btn-generar" data-index="${i}">Generar</button></td> <!-- ✅ botón -->
+  `;
+  cuerpo.appendChild(tr);
+});
       } catch (err) {
-        alert('Error al cargar empleados');
         console.error(err);
+        alert('Error al cargar empleados');
       }
     }
 
-    function abrirCarta({ cedula, nombre, cargo, ingreso, egreso, sueldo, razon }) {
-      const fecha = new Date().toLocaleDateString('es-VE');
-      const html = `
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-          <meta charset="UTF-8">
-          <title>Constancia de Trabajo</title>
-          <style>
-            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
-            h1 { text-align: center; }
-            .firma { margin-top: 80px; text-align: left; }
-          </style>
-        </head>
-        <body>
-          <h1>CONSTANCIA DE TRABAJO</h1>
-          <p>Por medio de la presente se hace constar que el ciudadano <strong>${nombre}</strong>, titular de la cédula de identidad N° <strong>${cedula}</strong>, desempeñó el cargo de <strong>${cargo}</strong> en <strong>${razon}</strong> desde el <strong>${ingreso}</strong> hasta el <strong>${egreso || 'la actualidad'}</strong>, percibiendo un sueldo mensual de <strong>${sueldo}</strong>.</p>
-          <p>Esta constancia se expide a solicitud del interesado, en Los Teques, a los ${fecha}.</p>
-          <div class="firma">
-            <p>__________________________</p>
-            <p>Departamento de Recursos Humanos</p>
-            <p>${razon}</p>
-          </div>
-        </body>
-        </html>
-      `;
-      const win = window.open('', '_blank');
-      win.document.write(html);
-      win.document.close();
-    }
+    // Plantilla de carta y apertura para PDF (Print)
+    function abrirCarta({ cedula, nombre, cargo, ingreso, egreso, sueldo, razon, rif, direccion }) {
+  const fecha = new Date();
+  const dia = fecha.getDate();
+  const mes = fecha.toLocaleString('es-VE', { month: 'long' });
+  const año = fecha.getFullYear();
 
+  const esActivo = !egreso || egreso.trim() === '';
+
+  const cuerpo = esActivo
+    ? `Por medio de la presente se hace constar que el ciudadano (a) ${nombre}, venezolano (a), mayor de edad y portador de la cédula de identidad N° ${cedula}, labora en esta empresa desde el día ${ingreso}, en el cargo de ${cargo}, devengando un salario mensual de ${sueldo}.`
+    : `Por medio de la presente se hace constar que el ciudadano (a) ${nombre}, venezolano (a), mayor de edad y portador de la cédula de identidad N° ${cedula}, laboró en esta empresa desde el día ${ingreso} hasta la fecha ${egreso}, en el cargo de ${cargo}, devengando un salario mensual de ${sueldo}.`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Constancia de Trabajo</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; color:#000; }
+        h2 { text-align: center; font-size:16px; margin-bottom:10px; }
+        p  { margin: 8px 0; }
+        .firma { margin-top: 80px; text-align: center; }
+      </style>
+    </head>
+    <body>
+
+      <div style="
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.08;
+  z-index: 0;
+">
+  <img src='logo-canguro.png' alt='Logo Canguro' style="height:190px;" />
+</div>
+
+      <div style="width:600px; margin:0 auto; text-align:center;">
+        <div style="text-align:left; font-size:15px; margin-bottom:160px;">
+          <strong>${razon}</strong><br />
+          <strong>RIF:</strong> ${rif}
+        </div>
+        <h2>A QUIEN PUEDA INTERESAR</h2>
+        <p style="text-align:justify;">${cuerpo}</p>
+        <p style="text-align:justify;">
+          Constancia que se expide por la parte interesada en Caracas a los ${dia} días del mes de ${mes} del año ${año}.
+        </p>
+        <div class="firma">
+          <p>__________________________</p>
+          <p><img src="foto-magda.png" alt="Firma Autorizada" style="height:80px;" /></p>
+          <p>MAGDA UZCÁTEGUI</p>
+          <p>GERENTE DE RECLUTAMIENTO Y SELECCIÓN</p>
+        </div>
+        <p style="text-align:center; font-size:14px; margin-top:160px;">
+          Dirección: ${direccion}
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  win.print();
+}
+
+
+    // Carta rápida desde el formulario
     document.getElementById('form-carta-html').addEventListener('submit', e => {
       e.preventDefault();
       const datos = Object.fromEntries(new FormData(e.target));
       abrirCarta(datos);
     });
 
+    // Generación masiva solo de seleccionados
     document.getElementById('generar-masivo').addEventListener('click', () => {
-      empleados.forEach(emp => abrirCarta(emp));
+      const seleccionados = Array.from(document.querySelectorAll('.check-empleado:checked'))
+        .map(chk => empleados[chk.dataset.index]);
+
+      if (seleccionados.length === 0) {
+        alert('Selecciona al menos un empleado');
+        return;
+      }
+
+      seleccionados.forEach(emp => abrirCarta(emp));
     });
 
+    // Seleccionar / deseleccionar todos
+    document.getElementById('selectAll').addEventListener('change', e => {
+      document.querySelectorAll('.check-empleado').forEach(chk => {
+        chk.checked = e.target.checked;
+      });
+    });
+
+    // Autocompletar por cédula
     document.querySelector('input[name="cedula"]').addEventListener('input', e => {
-      const cedula = e.target.value.trim();
-      const emp = empleados.find(e => e.cedula === cedula);
+      const ced = e.target.value.trim();
+      const emp = empleados.find(x => x.cedula === ced);
       if (emp) {
-        document.querySelector('input[name="nombre"]').value = emp.nombre;
-        document.querySelector('input[name="cargo"]').value = emp.cargo;
+        document.querySelector('input[name="nombre"]').value  = emp.nombre;
+        document.querySelector('input[name="cargo"]').value   = emp.cargo;
         document.querySelector('input[name="ingreso"]').value = emp.ingreso;
-        document.querySelector('input[name="egreso"]').value = emp.egreso;
-        document.querySelector('input[name="sueldo"]').value = emp.sueldo;
-        document.querySelector('input[name="razon"]').value = emp.razon;
+        document.querySelector('input[name="egreso"]').value  = emp.egreso;
+        document.querySelector('input[name="sueldo"]').value  = emp.sueldo;
+        document.querySelector('input[name="razon"]').value   = emp.razon;
       }
     });
 
+    // Listener para botones individuales
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('btn-generar')) {
+    const index = e.target.dataset.index;
+    abrirCarta(empleados[index]); // ✅ genera la carta con rif y dirección correctos
+  }
+});
+
+    // Cerrar sesión
     function cerrarSesion() {
       localStorage.removeItem('sesionCanguro');
-      window.location.href = 'login.html';
+      window.location.href = 'iniciar-sesion.html'; // ajusta al nombre real de tu login
     }
 
+    // Inicialización
     cargarEmpleados();
   </script>
 </body>
