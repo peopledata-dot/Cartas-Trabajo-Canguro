@@ -359,24 +359,29 @@
 
       // Buscador por cedula
 
-      document.getElementById("buscador-cedula").addEventListener("submit", async function(e) {
+    document.getElementById("buscador-cedula").addEventListener("submit", async function(e) {
   e.preventDefault();
   const cedula = document.getElementById("cedula").value.trim();
   const resultado = document.getElementById("resultado");
 
   try {
-    // Aquí pegas tu URL completa de Apps Script
     const res = await fetch(`https://script.google.com/macros/s/AKfycbyUJzUxOc56QUWWswi9yKG4n9EXqtYTzcZdzUEFIzZnT2xowFMa_eqNuSsLfLoPhTr9/exec?cedula=${cedula}`);
     const empleado = await res.json();
 
     if (empleado && empleado.Nombre) {
-      resultado.innerHTML = `<p>Empleado encontrado: ${empleado.Nombre}, ${empleado.Estado}</p>`;
+      resultado.innerHTML = `
+        <div class="resultado-empleado">
+          <p><strong>Nombre:</strong> ${empleado.Nombre}</p>
+          <p><strong>Cédula:</strong> ${cedula}</p>
+          <p><strong>Estado:</strong> ${empleado.Estado}</p>
+        </div>
+      `;
     } else {
       resultado.innerHTML = "<p>No se encontró registro para la cédula ingresada.</p>";
     }
   } catch (error) {
     resultado.innerHTML = "<p>Error al consultar la base de datos.</p>";
-    console.error(error);
+    console.error("Error en la consulta:", error);
   }
 });
 
