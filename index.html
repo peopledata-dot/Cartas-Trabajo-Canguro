@@ -386,14 +386,14 @@ document.addEventListener('click', e => {
     const index = e.target.dataset.index;
     abrirCarta(empleados[index]); // ✅ genera la carta con rif y dirección correctos
   }
-});
+}); 
 
     // Cerrar sesión
     function cerrarSesion() {
       localStorage.removeItem('sesionCanguro');
       window.location.href = 'iniciar-sesion.html'; // ajusta al nombre real de tu login
     }
-
+    
     // Inicialización
     cargarEmpleados();
   </script>
