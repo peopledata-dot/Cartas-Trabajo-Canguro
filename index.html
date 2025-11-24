@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartas de Trabajo | Canguro Venezuela</title>
   <link rel="stylesheet" href="styles.css" />
+
 </head>
 
   <style>
@@ -164,7 +165,28 @@
   <tbody id="cuerpo-tabla"></tbody>
 </table>
 
+
+  <!-- Buscador por cédula -->
+  <form id="buscador-cedula" class="buscador">
+    <label for="cedula">Buscar por cédula:</label>
+    <input type="text" id="cedula" name="cedula" placeholder="Ej: 12345678" required />
+    <button type="submit" class="btn-buscar">Buscar</button>
+  </form>
+
+  <!-- Resultado -->
+  <div id="resultado"></div>
+</main>
+
+<footer class="footer">
   <p class="pie">Dirección de Tecnología 2025 - Canguro Venezuela</p>
+</footer>
+
+<!-- Script debe ir aquí, fuera del <main> -->
+<script src="script.js"></script>
+</body>
+</html>
+
+
 
   <script>
     // Config Sheets
@@ -334,6 +356,29 @@
         document.querySelector('input[name="razon"]').value   = emp.razon;
       }
     });
+
+      // Buscador por cedula
+
+      document.getElementById("buscador-cedula").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const cedula = document.getElementById("cedula").value.trim();
+  const resultado = document.getElementById("resultado");
+
+  try {
+    // Aquí pegas tu URL completa de Apps Script
+    const res = await fetch(`https://script.google.com/macros/s/AKfycbyUJzUxOc56QUWWswi9yKG4n9EXqtYTzcZdzUEFIzZnT2xowFMa_eqNuSsLfLoPhTr9/exec?cedula=${cedula}`);
+    const empleado = await res.json();
+
+    if (empleado && empleado.Nombre) {
+      resultado.innerHTML = `<p>Empleado encontrado: ${empleado.Nombre}, ${empleado.Estado}</p>`;
+    } else {
+      resultado.innerHTML = "<p>No se encontró registro para la cédula ingresada.</p>";
+    }
+  } catch (error) {
+    resultado.innerHTML = "<p>Error al consultar la base de datos.</p>";
+    console.error(error);
+  }
+});
 
     // Listener para botones individuales
 document.addEventListener('click', e => {
